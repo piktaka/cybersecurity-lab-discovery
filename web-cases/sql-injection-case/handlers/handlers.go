@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"html/template"
 	"net/http"
 
@@ -31,21 +32,31 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 }
 
 func LoginPage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, private")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
 	session, _ := store.Get(r, "session")
 	authenticated, ok := session.Values["authenticated"].(bool)
 	if ok && authenticated {
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		return
 	}
-	temp := template.Must(template.ParseFiles("login.html"))
+	temp := template.Must(template.ParseFiles("login2.html"))
 	temp.Execute(w, map[string]interface{}{
 		"Error": "",
 	})
 }
 
 func HandleLogin(w http.ResponseWriter, r *http.Request) {
+
 	if r.Method != http.MethodPost {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+		session, _ := store.Get(r, "session")
+	authenticated, ok := session.Values["authenticated"].(bool)
+	if ok && authenticated {
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		return
 	}
 	err := r.ParseForm()
@@ -59,26 +70,34 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	user.Username = r.FormValue("username")
 	user.Password = r.FormValue("password")
 
-	userFromDatabase, err := models.GetUser(user.Username)
+	err = models.GetUser(user.Username,user.Password)
 
 	if err != nil {
-		renderLoginPageWithError(w, "Error: user or password incorrect")
-		return
-	}
 
-	if userFromDatabase.Password != user.Password {
-		renderLoginPageWithError(w, "Error: user or password incorrect")
+if err == sql.ErrNoRows {
+renderLoginPageWithError(w, "Error: user or password incorrect")
 		return
+}else{
+	renderLoginPageWithError(w, "Error: Something went wrong")
+		return
+}
+		
 	}
+w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, private")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
 
-	session, _ := store.Get(r, "session")
+	session, _ = store.Get(r, "session")
 	session.Values["authenticated"] = true
-	session.Values["username"] = userFromDatabase.Username
+	session.Values["username"] = user.Username
 	session.Save(r, w)
-	http.Redirect(w, r, "/home", http.StatusCreated)
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 
 func renderLoginPageWithError(w http.ResponseWriter, errorMessage string) {
+		w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, private")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
 	w.WriteHeader(http.StatusBadRequest)
 	temp := template.Must(template.ParseFiles("login.html"))
 	temp.Execute(w, map[string]interface{}{

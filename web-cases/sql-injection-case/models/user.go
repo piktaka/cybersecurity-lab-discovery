@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"log"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -9,9 +10,9 @@ import (
 )
 
 type User struct {
-	ID       uint   `gorm:"primaryKey;autoIncrement"`
-	Username string `gorm:"unique;not null"`
-	Password string `gorm:"not null"`
+	ID       uint   
+	Username string 
+	Password string 
 }
 
 func Migrate() {
@@ -32,13 +33,11 @@ func InsertUser(username, password string) error {
 	return nil
 }
 
-func GetUser(username string) (*User, error) {
-	user := &User{}
-	result := database.DB.Where("username = ?", username).First(user)
-	if err := result.Error; err != nil {
-		return nil, err
-
-	}
-	return user, nil
-
+func GetUser(username,password string)(error) {
+query := fmt.Sprintf("SELECT * FROM users WHERE username = '%s' AND password='%s'", username,password)
+			fmt.Println("Executing query:", query)
+			row := database.NormalDB.QueryRow(query)
+			user:=&User{}
+			err:=row.Scan(&user.ID,&user.Username,&user.Password)
+return err
 }

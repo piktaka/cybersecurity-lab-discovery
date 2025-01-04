@@ -9,7 +9,8 @@ import (
 )
 
 func main() {
-	database.Initialize()
+	database.InitializeDB()
+	database.InitializeNormalDB()
 	models.Migrate()
 	http.HandleFunc("/login", handlers.LoginPage)
 	http.HandleFunc("/authenticate", handlers.HandleLogin)

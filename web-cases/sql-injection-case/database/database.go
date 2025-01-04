@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"log"
 
 	"gorm.io/driver/sqlite"
@@ -8,8 +9,8 @@ import (
 )
 
 var DB *gorm.DB
-
-func Initialize() {
+var NormalDB *sql.DB
+func InitializeDB() {
 	var err error
 
 	DB, err = gorm.Open(sqlite.Open("user.db"), &gorm.Config{})
@@ -21,4 +22,15 @@ func Initialize() {
 	}
 	log.Println("Database connected successfully")
 
+
+}
+
+func InitializeNormalDB(){
+	var err error
+
+		NormalDB, err = sql.Open("sqlite3", "user.db")
+	if err!=nil {
+		log.Fatal(err)
+	}
+		
 }
