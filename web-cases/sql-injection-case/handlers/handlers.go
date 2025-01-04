@@ -53,7 +53,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
-		session, _ := store.Get(r, "session")
+	session, _ := store.Get(r, "session")
 	authenticated, ok := session.Values["authenticated"].(bool)
 	if ok && authenticated {
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
@@ -70,36 +70,36 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	user.Username = r.FormValue("username")
 	user.Password = r.FormValue("password")
 
-	err = models.GetUser(user.Username,user.Password)
+	userfromDB, err := models.GetUser(user.Username, user.Password)
 
 	if err != nil {
 
-if err == sql.ErrNoRows {
-renderLoginPageWithError(w, "Error: user or password incorrect")
-		return
-}else{
-	renderLoginPageWithError(w, "Error: Something went wrong")
-		return
-}
-		
+		if err == sql.ErrNoRows {
+			renderLoginPageWithError(w, "Error: user or password incorrect")
+			return
+		} else {
+			renderLoginPageWithError(w, "Error: Something went wrong")
+			return
+		}
+
 	}
-w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, private")
+	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, private")
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
 
 	session, _ = store.Get(r, "session")
 	session.Values["authenticated"] = true
-	session.Values["username"] = user.Username
+	session.Values["username"] = userfromDB.Username
 	session.Save(r, w)
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 
 func renderLoginPageWithError(w http.ResponseWriter, errorMessage string) {
-		w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, private")
+	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, private")
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
 	w.WriteHeader(http.StatusBadRequest)
-	temp := template.Must(template.ParseFiles("login.html"))
+	temp := template.Must(template.ParseFiles("login2.html"))
 	temp.Execute(w, map[string]interface{}{
 		"Error": errorMessage,
 	})

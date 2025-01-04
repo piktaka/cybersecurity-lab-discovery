@@ -10,9 +10,9 @@ import (
 )
 
 type User struct {
-	ID       uint   
-	Username string 
-	Password string 
+	ID       uint
+	Username string
+	Password string
 }
 
 func Migrate() {
@@ -33,11 +33,11 @@ func InsertUser(username, password string) error {
 	return nil
 }
 
-func GetUser(username,password string)(error) {
-query := fmt.Sprintf("SELECT * FROM users WHERE username = '%s' AND password='%s'", username,password)
-			fmt.Println("Executing query:", query)
-			row := database.NormalDB.QueryRow(query)
-			user:=&User{}
-			err:=row.Scan(&user.ID,&user.Username,&user.Password)
-return err
+func GetUser(username, password string) (*User, error) {
+	query := fmt.Sprintf("SELECT * FROM users WHERE username = '%s' AND password='%s'", username, password)
+	fmt.Println("Executing query:", query)
+	row := database.NormalDB.QueryRow(query)
+	user := &User{}
+	err := row.Scan(&user.ID, &user.Username, &user.Password)
+	return user, err
 }
