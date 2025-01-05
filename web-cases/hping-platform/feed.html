@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Feed</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .header {
+            background-color: #00c09c;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .feed {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+        }
+
+        .post {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .post:last-child {
+            border-bottom: none;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .btn {
+            background-color: #00c09c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #009b84;
+        }
+
+        .comment-section {
+            margin-top: 10px;
+        }
+
+        .comment-input {
+            width: calc(100% - 30px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Simple Feed</h1>
+    </div>
+    <div class="feed">
+        <div class="post" data-post-id="1">
+            <p>Post content goes here...</p>
+            <div class="actions">
+                <button class="btn like-btn">Like</button>
+                <button class="btn dislike-btn">Dislike</button>
+            </div>
+            <div class="comment-section">
+                <input type="text" class="comment-input" placeholder="Write a comment...">
+                <button class="btn comment-btn">Comment</button>
+            </div>
+        </div>
+        <div class="post" data-post-id="2">
+            <p>Another post content...</p>
+            <div class="actions">
+                <button class="btn like-btn">Like</button>
+                <button class="btn dislike-btn">Dislike</button>
+            </div>
+            <div class="comment-section">
+                <input type="text" class="comment-input" placeholder="Write a comment...">
+                <button class="btn comment-btn">Comment</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Handle Like button
+            document.querySelectorAll(".like-btn").forEach(button => {
+                button.addEventListener("click", event => {
+                    const postId = event.target.closest(".post").dataset.postId;
+                    fetch(`/feed/${postId}/likes`, { method: "POST" })
+                        .then(response => response.json())
+                        .then(data => console.log(`Liked post ${postId}:`, data))
+                        .catch(err => console.error("Error liking post:", err));
+                });
+            });
+
+            // Handle Dislike button
+            document.querySelectorAll(".dislike-btn").forEach(button => {
+                button.addEventListener("click", event => {
+                    const postId = event.target.closest(".post").dataset.postId;
+                    fetch(`/feed/${postId}/likes`, { method: "DELETE" })
+                        .then(response => response.json())
+                        .then(data => console.log(`Disliked post ${postId}:`, data))
+                        .catch(err => console.error("Error disliking post:", err));
+                });
+            });
+
+            // Handle Comment button
+            document.querySelectorAll(".comment-btn").forEach(button => {
+                button.addEventListener("click", event => {
+                    const post = event.target.closest(".post");
+                    const postId = post.dataset.postId;
+                    const commentInput = post.querySelector(".comment-input");
+                    const commentText = commentInput.value;
+
+                    if (commentText.trim()) {
+                        fetch(`/feed/${postId}/comments`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ comment: commentText })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(`Comment added to post ${postId}:`, data);
+                                commentInput.value = ""; // Clear input
+                            })
+                            .catch(err => console.error("Error adding comment:", err));
+                    } else {
+                        alert("Comment cannot be empty!");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -15,7 +15,21 @@ type User struct {
 	Password string
 }
 
-func HomePage(w http.ResponseWriter, r *http.Request) {
+// func HomePage(w http.ResponseWriter, r *http.Request) {
+// 	session, _ := store.Get(r, "session")
+// 	authenticated, ok := session.Values["authenticated"].(bool)
+// 	if !ok || !authenticated {
+// 		http.Error(w, "You are not authenticated", http.StatusInternalServerError)
+// 		return
+// 	}
+
+// 	username := session.Values["username"].(string)
+
+// 	temp := template.Must(template.ParseFiles("home.html"))
+// 	temp.Execute(w, struct{ Username string }{Username: username})
+
+// }
+func FeedPage(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "session")
 	authenticated, ok := session.Values["authenticated"].(bool)
 	if !ok || !authenticated {
@@ -25,11 +39,10 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 
 	username := session.Values["username"].(string)
 
-	temp := template.Must(template.ParseFiles("home.html"))
+	temp := template.Must(template.ParseFiles("feed.html"))
 	temp.Execute(w, struct{ Username string }{Username: username})
 
 }
-
 func LoginPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, private")
 	w.Header().Set("Pragma", "no-cache")
@@ -37,7 +50,7 @@ func LoginPage(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "session")
 	authenticated, ok := session.Values["authenticated"].(bool)
 	if ok && authenticated {
-		http.Redirect(w, r, "/home", http.StatusSeeOther)
+		http.Redirect(w, r, "/feed", http.StatusSeeOther)
 		return
 	}
 	temp := template.Must(template.ParseFiles("login.html"))
@@ -81,7 +94,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	session.Values["authenticated"] = true
 	session.Values["username"] = userFromDatabase.Username
 	session.Save(r, w)
-	http.Redirect(w, r, "/home", http.StatusSeeOther)
+	http.Redirect(w, r, "/feed", http.StatusSeeOther)
 }
 
 func renderLoginPageWithError(w http.ResponseWriter, errorMessage string) {
