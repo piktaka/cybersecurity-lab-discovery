@@ -41,7 +41,7 @@ func LoginPage(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		return
 	}
-	temp := template.Must(template.ParseFiles("login2.html"))
+	temp := template.Must(template.ParseFiles("login.html"))
 	temp.Execute(w, map[string]interface{}{
 		"Error": "",
 	})
@@ -99,7 +99,7 @@ func renderLoginPageWithError(w http.ResponseWriter, errorMessage string) {
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
 	w.WriteHeader(http.StatusBadRequest)
-	temp := template.Must(template.ParseFiles("login2.html"))
+	temp := template.Must(template.ParseFiles("login.html"))
 	temp.Execute(w, map[string]interface{}{
 		"Error": errorMessage,
 	})
