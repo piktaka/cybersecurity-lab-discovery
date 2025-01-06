@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"lablabee.com/cybersecurity-discovery1/hping-plateform/database"
@@ -11,10 +12,16 @@ import (
 func main() {
 	database.Initialize()
 	models.Migrate()
+	fmt.Println("before handlers")
 	http.HandleFunc("/login", handlers.LoginPage)
 	http.HandleFunc("/authenticate", handlers.HandleLogin)
 	http.HandleFunc("/feed", handlers.FeedPage)
-	models.InsertUser("pikta", "pikta")
+	http.HandleFunc("/feed/{postId}/comments", handlers.HandleCommentCreation)
+	fmt.Println("after handlers")
+
+	// http.HandleFunc("/feed/likes", handlers.FeedPage)
+	// http.HandleFunc("/feed/comments/:id", handlers.FeedPage)
+	// models.InsertUser("pikta", "pikta")
 	http.ListenAndServe(":8080", nil)
 
 }

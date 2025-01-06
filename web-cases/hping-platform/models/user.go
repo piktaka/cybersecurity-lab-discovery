@@ -15,11 +15,11 @@ type User struct {
 
 func Migrate() {
 
-	if err := database.DB.AutoMigrate(&User{}); err != nil {
+	if err := database.DB.AutoMigrate(&User{}, &Comment{}, &Post{}); err != nil {
 		log.Fatalf("Failed to migrate User model: %v", err)
 	}
 
-	log.Println("User model migrated successfully")
+	log.Println("User,Post,Comment model migrated successfully")
 }
 
 func InsertUser(username, password string) error {

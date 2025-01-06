@@ -107,6 +107,7 @@
             document.querySelectorAll(".like-btn").forEach(button => {
                 button.addEventListener("click", event => {
                     const postId = event.target.closest(".post").dataset.postId;
+                    
                     fetch(`/feed/${postId}/likes`, { method: "POST" })
                         .then(response => response.json())
                         .then(data => console.log(`Liked post ${postId}:`, data))
@@ -127,29 +128,57 @@
 
             // Handle Comment button
             document.querySelectorAll(".comment-btn").forEach(button => {
-                button.addEventListener("click", event => {
-                    const post = event.target.closest(".post");
-                    const postId = post.dataset.postId;
-                    const commentInput = post.querySelector(".comment-input");
-                    const commentText = commentInput.value;
+    button.addEventListener("click", event => {
+        const post = event.target.closest(".post"); // Find the parent post
+        const postId = post.dataset.postId;        // Extract the post ID
+        console.log("post id",postId)
+        const commentInput = post.querySelector(".comment-input"); // Get the comment input field
+        const commentText = commentInput.value;   // Get the entered comment
 
-                    if (commentText.trim()) {
-                        fetch(`/feed/${postId}/comments`, {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ comment: commentText })
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                console.log(`Comment added to post ${postId}:`, data);
-                                commentInput.value = ""; // Clear input
-                            })
-                            .catch(err => console.error("Error adding comment:", err));
-                    } else {
-                        alert("Comment cannot be empty!");
-                    }
-                });
+        if (commentText.trim()) {
+            fetch(`/feed/${postId}/comments`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ comment: commentText })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Failed to add comment: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(`Comment added to post ${postId}:`, data);
+
+                // Add the new comment to the DOM
+                const commentList = post.querySelector(".comment-list");
+                if (!commentList) {
+                    // Create a comment list if it doesn't exist
+                    const newCommentList = document.createElement("ul");
+                    newCommentList.className = "comment-list";
+                    post.appendChild(newCommentList);
+                }
+
+                const commentListUpdated = post.querySelector(".comment-list");
+
+                // Create a new list item for the comment
+                const newComment = document.createElement("li");
+                newComment.textContent = commentText;
+
+                commentListUpdated.appendChild(newComment);
+
+                // Clear the input field
+                commentInput.value = "";
+            })
+            .catch(err => {
+                console.error("Error adding comment:", err);
+                alert("Failed to add comment. Please try again.");
             });
+        } else {
+            alert("Comment cannot be empty!");
+        }
+    });
+});
         });
     </script>
 </body>

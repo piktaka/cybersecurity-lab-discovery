@@ -1,9 +1,14 @@
 package handlers
 
 import (
+	"encoding/json"
+	"fmt"
 	"html/template"
+	"log"
 	"net/http"
+	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"lablabee.com/cybersecurity-discovery1/hping-plateform/models"
 )
@@ -13,6 +18,17 @@ var store = sessions.NewCookieStore([]byte("super-secret-key"))
 type User struct {
 	Username string
 	Password string
+}
+
+type Post struct {
+	ID      uint      `gorm:"primaryKey;autoIncrement"`
+	Content string    `gorm:"type:text;not null"`
+	Comment []Comment `gorm:"foreignKey:PostID;constraint:OnDelete:CASCADE"`
+}
+type Comment struct {
+	ID      uint   `json:"id"`
+	PostID  uint   `json:"post_id"`
+	Comment string `json:"comment"`
 }
 
 // func HomePage(w http.ResponseWriter, r *http.Request) {
@@ -106,4 +122,55 @@ func renderLoginPageWithError(w http.ResponseWriter, errorMessage string) {
 	temp.Execute(w, map[string]interface{}{
 		"Error": errorMessage,
 	})
+}
+
+func HandleCommentCreation(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+
+		vars := mux.Vars(r)
+		postIdString := vars["postId"]
+		postId, err := strconv.ParseUint(postIdString, 10, 64)
+		fmt.Println("this is the postID", postId)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		comment := Comment{}
+		bodyDecoder := json.NewDecoder(r.Body)
+		err = bodyDecoder.Decode(&comment)
+		comment.PostID = uint(postId)
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		databaseComment, err := models.CreateComment(uint(postId), comment.Comment)
+		if err != nil {
+			log.Println(err)
+
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+
+		}
+		comment.ID = databaseComment.ID
+		_, err = models.AddComment(*databaseComment)
+		if err != nil {
+			log.Println(err)
+
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+
+		}
+		bodyEncoder := json.NewEncoder(w)
+		err = bodyEncoder.Encode(comment)
+		if err != nil {
+			log.Println(err)
+
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+
+		}
+		w.WriteHeader(http.StatusCreated)
+
+	}
 }
