@@ -16,6 +16,8 @@ func main() {
 	http.HandleFunc("/login", handlers.LoginPage)
 	http.HandleFunc("/authenticate", handlers.HandleLogin)
 	http.HandleFunc("/feed", handlers.FeedPage)
+	http.HandleFunc("/feed/posts", handlers.HandlePostCreation)
+
 	http.HandleFunc("/feed/{postId}/comments", handlers.HandleCommentCreation)
 	fmt.Println("after handlers")
 

@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
-	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"lablabee.com/cybersecurity-discovery1/hping-plateform/models"
 )
@@ -21,9 +21,9 @@ type User struct {
 }
 
 type Post struct {
-	ID      uint      `gorm:"primaryKey;autoIncrement"`
-	Content string    `gorm:"type:text;not null"`
-	Comment []Comment `gorm:"foreignKey:PostID;constraint:OnDelete:CASCADE"`
+	ID      uint      `json:"id"`
+	Content string    `json:"content"`
+	Comment []Comment `json:"comments"`
 }
 type Comment struct {
 	ID      uint   `json:"id"`
@@ -126,9 +126,12 @@ func renderLoginPageWithError(w http.ResponseWriter, errorMessage string) {
 
 func HandleCommentCreation(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-
-		vars := mux.Vars(r)
-		postIdString := vars["postId"]
+	path := r.URL.Path
+    parts := strings.Split(path, "/")
+	
+		// postIdString := vars["postId"]
+		postIdString:=parts[2]
+		fmt.Println(postIdString)
 		postId, err := strconv.ParseUint(postIdString, 10, 64)
 		fmt.Println("this is the postID", postId)
 		if err != nil {
@@ -173,4 +176,39 @@ func HandleCommentCreation(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusCreated)
 
 	}
+}
+
+
+func HandlePostCreation(w http.ResponseWriter, r *http.Request){
+	post:=Post{}
+	bodyDecoder := json.NewDecoder(r.Body)
+		err := bodyDecoder.Decode(&post)
+		if err != nil {
+			log.Println(err)
+
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+
+		}
+	postFromDatabase,err:=models.CreatePost(post.Content)
+		if err != nil {
+			log.Println(err)
+
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+
+		}
+		post.ID=postFromDatabase.ID
+		bodyEncoder := json.NewEncoder(w)
+		err = bodyEncoder.Encode(post)
+		if err != nil {
+			log.Println(err)
+
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+
+		}
+		w.WriteHeader(http.StatusCreated)
+
+		
 }

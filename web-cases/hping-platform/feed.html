@@ -1,185 +1,252 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Simple Feed</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+        color: #333;
+      }
 
-        .header {
-            background-color: #00c09c;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-        }
+      .header {
+        background-color: #00c09c;
+        color: #fff;
+        padding: 20px;
+        text-align: center;
+      }
 
-        .feed {
-            max-width: 600px;
-            margin: 20px auto;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            padding: 15px;
-        }
+      .feed-container {
+        max-width: 600px;
+        margin: 20px auto;
+      }
 
-        .post {
-            margin-bottom: 20px;
-            padding: 15px;
-            border-bottom: 1px solid #ddd;
-        }
+      .new-post {
+        background: #fff;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
 
-        .post:last-child {
-            border-bottom: none;
-        }
+      .new-post textarea {
+        width: calc(100% - 30px);
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        resize: none;
+      }
 
-        .actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
+      .feed {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+      }
 
-        .btn {
-            background-color: #00c09c;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
+      .post {
+        margin-bottom: 20px;
+        padding: 15px;
+        border-bottom: 1px solid #ddd;
+      }
 
-        .btn:hover {
-            background-color: #009b84;
-        }
+      .post:last-child {
+        border-bottom: none;
+      }
 
-        .comment-section {
-            margin-top: 10px;
-        }
+      .actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+      }
 
-        .comment-input {
-            width: calc(100% - 30px);
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
+      .btn {
+        background-color: #00c09c;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .btn:hover {
+        background-color: #009b84;
+      }
+
+      .comment-section {
+        margin-top: 10px;
+      }
+
+      .comment-input {
+        width: calc(100% - 30px);
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="header">
-        <h1>Simple Feed</h1>
+      <h1>Simple Feed</h1>
     </div>
-    <div class="feed">
-        <div class="post" data-post-id="1">
-            <p>Post content goes here...</p>
-            <div class="actions">
-                <button class="btn like-btn">Like</button>
-                <button class="btn dislike-btn">Dislike</button>
-            </div>
-            <div class="comment-section">
-                <input type="text" class="comment-input" placeholder="Write a comment...">
-                <button class="btn comment-btn">Comment</button>
-            </div>
-        </div>
-        <div class="post" data-post-id="2">
-            <p>Another post content...</p>
-            <div class="actions">
-                <button class="btn like-btn">Like</button>
-                <button class="btn dislike-btn">Dislike</button>
-            </div>
-            <div class="comment-section">
-                <input type="text" class="comment-input" placeholder="Write a comment...">
-                <button class="btn comment-btn">Comment</button>
-            </div>
-        </div>
+
+    <div class="feed-container">
+      <!-- New Post Section -->
+      <div class="new-post">
+        <textarea
+          id="new-post-content"
+          rows="4"
+          placeholder="Write your post..."
+        ></textarea>
+        <button class="btn" id="add-post-btn">Add Post</button>
+      </div>
+
+      <!-- Feed Section -->
+      <div class="feed" id="feed">
+        <!-- Existing posts will be appended here -->
+      </div>
     </div>
+
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // Handle Like button
-            document.querySelectorAll(".like-btn").forEach(button => {
-                button.addEventListener("click", event => {
-                    const postId = event.target.closest(".post").dataset.postId;
-                    
-                    fetch(`/feed/${postId}/likes`, { method: "POST" })
-                        .then(response => response.json())
-                        .then(data => console.log(`Liked post ${postId}:`, data))
-                        .catch(err => console.error("Error liking post:", err));
-                });
-            });
+      document.addEventListener("DOMContentLoaded", () => {
+        // Handle adding a new post
+        document
+          .getElementById("add-post-btn")
+          .addEventListener("click", () => {
+            const postContent = document
+              .getElementById("new-post-content")
+              .value.trim();
 
-            // Handle Dislike button
-            document.querySelectorAll(".dislike-btn").forEach(button => {
-                button.addEventListener("click", event => {
-                    const postId = event.target.closest(".post").dataset.postId;
-                    fetch(`/feed/${postId}/likes`, { method: "DELETE" })
-                        .then(response => response.json())
-                        .then(data => console.log(`Disliked post ${postId}:`, data))
-                        .catch(err => console.error("Error disliking post:", err));
-                });
-            });
-
-            // Handle Comment button
-            document.querySelectorAll(".comment-btn").forEach(button => {
-    button.addEventListener("click", event => {
-        const post = event.target.closest(".post"); // Find the parent post
-        const postId = post.dataset.postId;        // Extract the post ID
-        console.log("post id",postId)
-        const commentInput = post.querySelector(".comment-input"); // Get the comment input field
-        const commentText = commentInput.value;   // Get the entered comment
-
-        if (commentText.trim()) {
-            fetch(`/feed/${postId}/comments`, {
+            if (postContent) {
+              fetch("/feed/posts", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ comment: commentText })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Failed to add comment: ${response.statusText}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log(`Comment added to post ${postId}:`, data);
+                body: JSON.stringify({ content: postContent }),
+              })
+                .then((response) => {
+                  if (!response.ok) {
+                    throw new Error(
+                      `Failed to create post: ${response.statusText}`
+                    );
+                  }
+                  return response.json();
+                })
+                .then((data) => {
+                  console.log("Post created:", data);
+                  addPostToFeed(data.id, postContent);
+                  document.getElementById("new-post-content").value = ""; // Clear textarea
+                })
+                .catch((err) => {
+                  console.error("Error creating post:", err);
+                  alert("Failed to create post. Please try again.");
+                });
+            } else {
+              alert("Post content cannot be empty!");
+            }
+          });
 
-                // Add the new comment to the DOM
-                const commentList = post.querySelector(".comment-list");
-                if (!commentList) {
-                    // Create a comment list if it doesn't exist
-                    const newCommentList = document.createElement("ul");
-                    newCommentList.className = "comment-list";
-                    post.appendChild(newCommentList);
-                }
+        // Add a new post to the feed
+        function addPostToFeed(postId, content) {
+          const feed = document.getElementById("feed");
 
-                const commentListUpdated = post.querySelector(".comment-list");
+          // Create post element
+          const post = document.createElement("div");
+          post.className = "post";
+          post.dataset.postId = postId;
 
-                // Create a new list item for the comment
-                const newComment = document.createElement("li");
-                newComment.textContent = commentText;
+          // Add content
+          post.innerHTML = `
+                    <p>${content}</p>
+                    <div class="actions">
+                        <button class="btn like-btn">Like</button>
+                        <button class="btn dislike-btn">Dislike</button>
+                    </div>
+                    <div class="comment-section">
+                        <input type="text" class="comment-input" placeholder="Write a comment...">
+                        <button class="btn comment-btn">Comment</button>
+                    </div>
+                `;
 
-                commentListUpdated.appendChild(newComment);
+          // Add the post to the bottom of the feed
+          feed.appendChild(post);
 
-                // Clear the input field
-                commentInput.value = "";
-            })
-            .catch(err => {
-                console.error("Error adding comment:", err);
-                alert("Failed to add comment. Please try again.");
-            });
-        } else {
-            alert("Comment cannot be empty!");
+          // Attach event listeners for like, dislike, and comment
+          attachEventListenersToPost(post);
         }
-    });
-});
-        });
+
+        // Attach event listeners to a post
+        function attachEventListenersToPost(post) {
+          const postId = post.dataset.postId;
+
+          // Handle Like button
+          post.querySelector(".like-btn").addEventListener("click", () => {
+            fetch(`/feed/${postId}/likes`, { method: "POST" })
+              .then((response) => response.json())
+              .then((data) => console.log(`Liked post ${postId}:`, data))
+              .catch((err) => console.error("Error liking post:", err));
+          });
+
+          // Handle Dislike button
+          post.querySelector(".dislike-btn").addEventListener("click", () => {
+            fetch(`/feed/${postId}/likes`, { method: "DELETE" })
+              .then((response) => response.json())
+              .then((data) => console.log(`Disliked post ${postId}:`, data))
+              .catch((err) => console.error("Error disliking post:", err));
+          });
+
+          // Handle Comment button
+          post.querySelector(".comment-btn").addEventListener("click", () => {
+            const commentInput = post.querySelector(".comment-input");
+            const commentText = commentInput.value.trim();
+
+            if (commentText) {
+              fetch(`/feed/${postId}/comments`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ comment: commentText }),
+              })
+                .then((response) => {
+                  if (!response.ok) {
+                    throw new Error(
+                      `Failed to add comment: ${response.statusText}`
+                    );
+                  }
+                  return response.json();
+                })
+                .then((data) => {
+                  console.log(`Comment added to post ${postId}:`, data);
+                  const commentList =
+                    post.querySelector(".comment-list") ||
+                    createCommentList(post);
+                  const newComment = document.createElement("li");
+                  newComment.textContent = commentText;
+                  commentList.appendChild(newComment);
+                  commentInput.value = "";
+                })
+                .catch((err) => console.error("Error adding comment:", err));
+            } else {
+              alert("Comment cannot be empty!");
+            }
+          });
+        }
+
+        // Create a comment list for a post
+        function createCommentList(post) {
+          const commentList = document.createElement("ul");
+          commentList.className = "comment-list";
+          post.appendChild(commentList);
+          return commentList;
+        }
+      });
     </script>
-</body>
+  </body>
 </html>
