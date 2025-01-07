@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gorilla/sessions"
 	"lablabee.com/cybersecurity-discovery1/hping-plateform/models"
@@ -21,14 +22,15 @@ type User struct {
 }
 
 type Post struct {
-	ID      uint      `json:"id"`
-	Content string    `json:"content"`
-	Comment []Comment `json:"comments"`
+	ID       uint      `json:"id"`
+	Content  string    `json:"content"`
+	Comments []Comment `json:"comments"`
 }
 type Comment struct {
-	ID      uint   `json:"id"`
-	PostID  uint   `json:"post_id"`
-	Comment string `json:"comment"`
+	ID        uint      `json:"id"`
+	PostID    uint      `json:"post_id"`
+	Comment   string    `json:"comment"`
+	Timestamp time.Time `json:"timestamp"`
 }
 
 // func HomePage(w http.ResponseWriter, r *http.Request) {
@@ -53,10 +55,16 @@ func FeedPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	username := session.Values["username"].(string)
+	// username := session.Values["username"].(string)
 
 	temp := template.Must(template.ParseFiles("feed.html"))
-	temp.Execute(w, struct{ Username string }{Username: username})
+	posts, err := models.GetAllPosts()
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Failed to load posts", http.StatusInternalServerError)
+		return
+	}
+	temp.Execute(w, posts)
 
 }
 func LoginPage(w http.ResponseWriter, r *http.Request) {
@@ -126,11 +134,11 @@ func renderLoginPageWithError(w http.ResponseWriter, errorMessage string) {
 
 func HandleCommentCreation(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-	path := r.URL.Path
-    parts := strings.Split(path, "/")
-	
+		path := r.URL.Path
+		parts := strings.Split(path, "/")
+
 		// postIdString := vars["postId"]
-		postIdString:=parts[2]
+		postIdString := parts[2]
 		fmt.Println(postIdString)
 		postId, err := strconv.ParseUint(postIdString, 10, 64)
 		fmt.Println("this is the postID", postId)
@@ -147,7 +155,8 @@ func HandleCommentCreation(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		databaseComment, err := models.CreateComment(uint(postId), comment.Comment)
+		comment.Timestamp = time.Now()
+		databaseComment, err := models.CreateComment(uint(postId), comment.Comment, comment.Timestamp)
 		if err != nil {
 			log.Println(err)
 
@@ -178,10 +187,11 @@ func HandleCommentCreation(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func HandlePostCreation(w http.ResponseWriter, r *http.Request) {
 
-func HandlePostCreation(w http.ResponseWriter, r *http.Request){
-	post:=Post{}
-	bodyDecoder := json.NewDecoder(r.Body)
+	if r.Method == http.MethodPost {
+		post := Post{}
+		bodyDecoder := json.NewDecoder(r.Body)
 		err := bodyDecoder.Decode(&post)
 		if err != nil {
 			log.Println(err)
@@ -190,7 +200,7 @@ func HandlePostCreation(w http.ResponseWriter, r *http.Request){
 			return
 
 		}
-	postFromDatabase,err:=models.CreatePost(post.Content)
+		postFromDatabase, err := models.CreatePost(post.Content)
 		if err != nil {
 			log.Println(err)
 
@@ -198,7 +208,7 @@ func HandlePostCreation(w http.ResponseWriter, r *http.Request){
 			return
 
 		}
-		post.ID=postFromDatabase.ID
+		post.ID = postFromDatabase.ID
 		bodyEncoder := json.NewEncoder(w)
 		err = bodyEncoder.Encode(post)
 		if err != nil {
@@ -209,6 +219,51 @@ func HandlePostCreation(w http.ResponseWriter, r *http.Request){
 
 		}
 		w.WriteHeader(http.StatusCreated)
+		return
+	}
+	if r.Method == http.MethodGet {
+		postsFromDB, err := models.GetAllPosts()
+		if err != nil {
+			log.Println(err)
 
-		
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+
+		}
+		posts := PostsfromDBtoJSON(postsFromDB)
+		log.Println(posts)
+		bodyEncoder := json.NewEncoder(w)
+		err = bodyEncoder.Encode(posts)
+		if err != nil {
+			log.Println(err)
+
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+
+		}
+		w.WriteHeader(http.StatusOK)
+
+	}
+
+}
+
+func PostsfromDBtoJSON(dbPosts []models.Post) []Post {
+	var post Post
+	posts := make([]Post, 0, len(dbPosts))
+	for _, dbPost := range dbPosts {
+		post = Post{ID: dbPost.ID, Content: dbPost.Content, Comments: CommentsfromDBtoJSON(dbPost.Comments)}
+		posts = append(posts, post)
+	}
+	return posts
+}
+
+func CommentsfromDBtoJSON(dbComments []models.Comment) []Comment {
+	var comment Comment
+	comments := make([]Comment, 0, len(dbComments))
+	for _, dbComment := range dbComments {
+		comment = Comment{ID: dbComment.ID, Comment: dbComment.Content, Timestamp: dbComment.Timestamp}
+		comments = append(comments, comment)
+	}
+	return comments
+
 }

@@ -5,9 +5,9 @@ import (
 )
 
 type Post struct {
-	ID      uint      `gorm:"primaryKey;autoIncrement"`
-	Content string    `gorm:"type:text;not null"`
-	Comment []Comment `gorm:"foreignKey:PostID;constraint:OnDelete:CASCADE"`
+	ID       uint      `gorm:"primaryKey;autoIncrement"`
+	Content  string    `gorm:"type:text;not null"`
+	Comments []Comment `gorm:"foreignKey:PostID;constraint:OnDelete:CASCADE"`
 }
 
 func CreatePost(content string) (*Post, error) {
@@ -23,10 +23,19 @@ func AddComment(comment Comment) (*Post, error) {
 	if err := result.Error; err != nil {
 		return nil, err
 	}
-	post.Comment = append(post.Comment, comment)
+	post.Comments = append(post.Comments, comment)
 	result = database.DB.Save(post)
 	if err := result.Error; err != nil {
 		return nil, err
 	}
 	return post, nil
+}
+
+func GetAllPosts() ([]Post, error) {
+	posts := make([]Post, 0, 10)
+	err := database.DB.Preload("Comments").Find(&posts).Error
+	if err != nil {
+		return nil, err
+	}
+	return posts, nil
 }
