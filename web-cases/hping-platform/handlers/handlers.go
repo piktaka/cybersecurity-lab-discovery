@@ -11,7 +11,8 @@ import (
 	"time"
 
 	"github.com/gorilla/sessions"
-	"lablabee.com/cybersecurity-discovery1/hping-plateform/models"
+	// "lablabee.com/cybersecurity-discovery1/hping-plateform/models"
+	"hping-platform/models"
 )
 
 var store = sessions.NewCookieStore([]byte("super-secret-key"))

@@ -3,7 +3,8 @@ package models
 import (
 	"time"
 
-	"lablabee.com/cybersecurity-discovery1/hping-plateform/database"
+	// "lablabee.com/cybersecurity-discovery1/hping-plateform/database"
+	"hping-platform/database"
 )
 
 type Comment struct {

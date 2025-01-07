@@ -4,9 +4,13 @@ import (
 	"fmt"
 	"net/http"
 
-	"lablabee.com/cybersecurity-discovery1/hping-plateform/database"
-	"lablabee.com/cybersecurity-discovery1/hping-plateform/handlers"
-	"lablabee.com/cybersecurity-discovery1/hping-plateform/models"
+	// "lablabee.com/cybersecurity-discovery1/hping-plateform/database"
+	// "lablabee.com/cybersecurity-discovery1/hping-plateform/handlers"
+	// "lablabee.com/cybersecurity-discovery1/hping-plateform/models"
+
+	"hping-platform/database"
+	"hping-platform/handlers"
+	"hping-platform/models"
 )
 
 func main() {
