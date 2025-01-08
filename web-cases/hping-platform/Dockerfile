@@ -22,8 +22,12 @@ COPY . /opt/hping-platform
 WORKDIR /opt/hping-platform
 
 # Install Go modules and build the project
+RUN apt update && apt install -y gcc
+
+ENV CGO_ENABLED=1
 RUN go mod tidy
 RUN go build -o hping-plateform .
 
+EXPOSE 8080
 # Set the entry point
 CMD ["./hping-plateform"]
