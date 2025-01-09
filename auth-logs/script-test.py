@@ -9,7 +9,7 @@ class SSHLogAnalyzer:
     def __init__(self, log_path: str):
         self.log_path = log_path
         self.attempts = []
-        
+        self.user_attempts=defaultdict(list)
     def parse_log_file(self) -> None:
         """Parse the SSH log file and store attempts."""
         try:
@@ -109,9 +109,10 @@ class SSHLogAnalyzer:
 
             # Group attempts by username for this IP
             user_attempts = defaultdict(list)
+
             for attempt in attempts:
                 user_attempts[attempt['username']].append(attempt)
-
+                self.user_attempts[attempt['username']].append(attempt)
             # Sort users by their first attempt timestamp
             sorted_users = sorted(user_attempts.items(), 
                                 key=lambda x: min(a['timestamp'] for a in x[1]))
@@ -147,12 +148,44 @@ class SSHLogAnalyzer:
     
     
     
-    def generate_report_by_username(self,username) -> str:
-        for _,attempt in self.attempts:
-            print(attempt)
+    def generate_report_by_username(self, username) -> str:
+      # Check if the username exists in user_attempts
+      if username not in self.user_attempts:
+          return f"No login attempts found for user: {username}"
+
+      # Get the user's login attempts
+      attempts = self.user_attempts[username]
+
+      # Total number of attempts
+      total_attempts = len(attempts)
+
+      # Get the last attempt's timestamp
+      last_attempt_time = attempts[-1]['timestamp']
+
+      # Count occurrences of each status
+      status_counts = {}
+      for attempt in attempts:
+          status = attempt['status']
+          status_counts[status] = status_counts.get(status, 0) + 1
+
+      # Build the status report
+      status_report = ", ".join([f"{status} ({count} attempts)" for status, count in status_counts.items()])
+
+      # Print the report
+      report = (
+          f"Time: {attempts[0]['timestamp']}\n"
+          f"Last Attempt: {last_attempt_time}\n"
+          f"Total Attempts: {total_attempts}\n"
+          f"User: {username}\n"
+          f"Status: {status_report}"
+      )
+      return report
+
 
 def main():
     parser = argparse.ArgumentParser(description='Analyze SSH log files for connection attempts.')
+    parser.add_argument('-u', '--user', help='Get logs for specific user')
+    
     parser.add_argument('log_file', help='Path to the SSH log file')
     parser.add_argument('-o', '--output', help='Output file for the report')
     parser.add_argument('-d', '--debug', action='store_true', 
@@ -161,7 +194,17 @@ def main():
 
     analyzer = SSHLogAnalyzer(args.log_file)
     analyzer.parse_log_file()
-    report = analyzer.generate_report()
+    report=""
+    if args.user:
+        # print(analyzer.generate_report_by_username("admin"))
+        # report=analyzer.generate_report_by_username(f"{args.user}".strip())
+        analyzer.generate_report()
+        report=analyzer.generate_report_by_username(args.user.strip())
+        print()
+        # report=analyzer.generate_report_by_username("admin")
+
+    else:
+        report = analyzer.generate_report()
 
     if args.output:
         with open(args.output, 'w') as f:
