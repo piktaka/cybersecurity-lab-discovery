@@ -16,6 +16,6 @@ func main() {
 	http.HandleFunc("/authenticate", handlers.HandleLogin)
 	http.HandleFunc("/home", handlers.HomePage)
 	models.InsertUser("pikta", "pikta")
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8090", nil)
 
 }
