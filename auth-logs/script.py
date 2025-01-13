@@ -215,7 +215,7 @@ def main():
     parser.add_argument('-o', '--output', help='Output file for the report')
     parser.add_argument('-d', '--debug', action='store_true', 
                        help='Include raw log lines in output')
-    parser.add_argument('--attempts', help='Output file for the report')
+    parser.add_argument('--attempts', help='Set number of attemtps for a specific user')
     
     args = parser.parse_args()
 
@@ -228,6 +228,7 @@ def main():
               exit(-1)
               
           notify_attempts(args.log_file,args.user.strip(),int(args.attempts))
+          exit(0)
         # print(analyzer.generate_report_by_username("admin"))
         # report=analyzer.generate_report_by_username(f"{args.user}".strip())
         analyzer = SSHLogAnalyzer(args.log_file)
