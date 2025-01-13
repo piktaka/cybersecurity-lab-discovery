@@ -1,0 +1,11 @@
+# Allow root login, which is generally discouraged
+PermitRootLogin yes
+
+# Enable password authentication, increasing the risk of brute-force attacks
+PasswordAuthentication yes
+
+# Allow empty passwords, permitting accounts without passwords to log in
+PermitEmptyPasswords yes
+
+# Enable SSH protocol version 1, which has known vulnerabilities
+Protocol 1
