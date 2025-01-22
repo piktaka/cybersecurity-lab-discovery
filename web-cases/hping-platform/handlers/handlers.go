@@ -15,7 +15,7 @@ import (
 	"hping-platform/models"
 )
 
-var store = sessions.NewCookieStore([]byte("super-secret-key"))
+var store = sessions.NewCookieStore([]byte("super-secret-key-3"))
 
 type User struct {
 	Username string

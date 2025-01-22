@@ -14,7 +14,7 @@ func main() {
 	http.HandleFunc("/login", handlers.LoginPage)
 	http.HandleFunc("/authenticate", handlers.HandleLogin)
 	http.HandleFunc("/home", handlers.HomePage)
-	models.InsertUser("pikta", "pikta")
-	http.ListenAndServe(":8090", nil)
+	models.InsertUser("lablabee", "lablabee123")
+	http.ListenAndServe(":8080", nil)
 
 }

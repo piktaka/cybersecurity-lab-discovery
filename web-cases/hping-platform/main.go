@@ -27,10 +27,10 @@ func main() {
 
 	// http.HandleFunc("/feed/likes", handlers.FeedPage)
 	// http.HandleFunc("/feed/comments/:id", handlers.FeedPage)
-	// models.InsertUser("lablabee", "lablabee#2025@!")
-	// models.CreatePost("Hello This is the first post in the hping part of the lab")
-	// models.CreatePost("Hello This another post in the hping part of the lab Hehe")
-	// models.CreatePost("Can you stop the platform from working !! Hehe")
+	models.InsertUser("lablabee", "lablabee#2025@!")
+	models.CreatePost("Hello This is the first post in the hping part of the lab")
+	models.CreatePost("Hello This another post in the hping part of the lab Hehe")
+	models.CreatePost("Can you stop the platform from working !! Hehe")
 
 	http.ListenAndServe(":8080", nil)
 

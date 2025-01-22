@@ -9,7 +9,7 @@ import (
 	"lablabee.com/cybersecurity-discovery1/sql-injection/models"
 )
 
-var store = sessions.NewCookieStore([]byte("super-secret-key"))
+var store = sessions.NewCookieStore([]byte("super-secret-key-2"))
 
 type User struct {
 	Username string
