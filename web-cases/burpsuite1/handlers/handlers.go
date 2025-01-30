@@ -94,3 +94,13 @@ func renderLoginPageWithError(w http.ResponseWriter, errorMessage string) {
 		"Error": errorMessage,
 	})
 }
+
+func Logout(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "session")
+	// Clear session data
+	session.Values["authenticated"] = false
+	session.Values["username"] = nil
+	session.Save(r, w)
+	// Redirect to the login page after logout
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
+}

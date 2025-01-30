@@ -16,7 +16,7 @@
             font-family: Arial, sans-serif;
         }
         svg#Layer_1 {
-      margin-bottom: 40px;
+            margin-bottom: 40px;
         }
         h1 {
             color: #333;
@@ -27,16 +27,30 @@
             color: #666;
             font-size: 1.2rem;
         }
+        .logout-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 5px;
+        }
+        .logout-btn:hover {
+            background-color: #d32f2f;
+        }
     </style>
 </head>
 <body>
 
-    <svg style="enable-background:new 0 0 32 32;" version="1.1" viewBox="0 0 32 32" width="500px" height="120px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="Layer_1"/><g id="play_x5F_alt"><path d="M16,0C7.164,0,0,7.164,0,16s7.164,16,16,16s16-7.164,16-16S24.836,0,16,0z M10,24V8l16.008,8L10,24z   " style="fill:#00c09c;"/></g></svg>
+    <svg style="enable-background:new 0 0 32 32;" version="1.1" viewBox="0 0 32 32" width="500px" height="120px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="Layer_1"/><g id="play_x5F_alt"><path d="M16,0C7.164,0,0,7.164,0,16s7.164,16,16,16s16-7.164,16-16S24.836,0,16,0z M10,24V8l16.008,8L10,24z" style="fill:#00c09c;"/></g></svg>
     <p style="color: #333; text-align: center; ">PLAY</p>
-    </div>
-
-          <!-- <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 48 48" width="150px" height="150px"><linearGradient id="IMoH7gpu5un5Dx2vID39Ra" x1="9.858" x2="38.142" y1="9.858" y2="38.142" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9dffce"/><stop offset="1" stop-color="#50d18d"/></linearGradient><path fill="url(#IMoH7gpu5un5Dx2vID39Ra)" d="M44,24c0,11.045-8.955,20-20,20S4,35.045,4,24S12.955,4,24,4S44,12.955,44,24z"/><linearGradient id="IMoH7gpu5un5Dx2vID39Rb" x1="13" x2="36" y1="24.793" y2="24.793" gradientUnits="userSpaceOnUse"><stop offset=".824" stop-color="#135d36"/><stop offset=".931" stop-color="#125933"/><stop offset="1" stop-color="#11522f"/></linearGradient><path fill="url(#IMoH7gpu5un5Dx2vID39Rb)" d="M21.293,32.707l-8-8c-0.391-0.391-0.391-1.024,0-1.414l1.414-1.414	c0.391-0.391,1.024-0.391,1.414,0L22,27.758l10.879-10.879c0.391-0.391,1.024-0.391,1.414,0l1.414,1.414	c0.391,0.391,0.391,1.024,0,1.414l-13,13C22.317,33.098,21.683,33.098,21.293,32.707z"/></svg> -->
     <h1>Welcome to PLAY, {{.Username}}!</h1>
     <p>You are successfully logged in.</p>
+
+    <!-- Logout Button -->
+    <button class="logout-btn" onclick="window.location.href='/logout'">Logout</button>
+
 </body>
 </html>
