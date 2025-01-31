@@ -1,0 +1,16 @@
+Jan 24 06:15:43 hostname sshd[12345]: Failed password for root from 192.168.1.101 port 52890 ssh2
+Jan 24 06:15:46 hostname sshd[12345]: Failed password for root from 192.168.1.101 port 52890 ssh2
+Jan 24 06:15:49 hostname sshd[12345]: Failed password for root from 192.168.1.101 port 52890 ssh2
+Jan 24 06:45:20 hostname sshd[67890]: Failed password for root from 192.168.1.102 port 54231 ssh2
+Jan 24 06:45:22 hostname sshd[67890]: Failed password for root from 192.168.1.102 port 54231 ssh2
+Jan 24 06:45:20 hostname sshd[67890]: Failed password for root from 192.168.1.102 port 54231 ssh2
+Jan 24 06:45:22 hostname sshd[67890]: Failed password for root from 192.168.1.102 port 54231 ssh2
+Jan 24 06:45:20 hostname sshd[67890]: Failed password for root from 192.168.1.102 port 54231 ssh2
+Jan 24 06:45:22 hostname sshd[67890]: Failed password for root from 192.168.1.102 port 54231 ssh2
+Jan 24 06:45:20 hostname sshd[67890]: Failed password for root from 192.168.1.102 port 54231 ssh2
+Jan 24 06:45:22 hostname sshd[67890]: Failed password for root from 192.168.1.102 port 54231 ssh2
+Jan 24 06:15:43 hostname sshd[12345]: Failed password for root from 192.168.1.101 port 52890 ssh2
+Jan 24 06:15:46 hostname sshd[12345]: Failed password for root from 192.168.1.101 port 52890 ssh2
+Jan 24 06:15:49 hostname sshd[12345]: Failed password for root from 192.168.1.101 port 52890 ssh2
+Jan 24 06:45:20 hostname sshd[67890]: Failed password for root from 192.168.1.102 port 54231 ssh2
+Jan 24 06:45:22 hostname sshd[67890]: Failed password for root from 192.168.1.102 port 54231 ssh2

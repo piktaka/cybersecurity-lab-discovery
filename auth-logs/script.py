@@ -5,32 +5,35 @@ import os
 import argparse
 from typing import Dict, List, Tuple
 import time
+import fileinput
 from plyer import notification
 class SSHLogAnalyzer:
     def __init__(self, log_path: str):
         self.log_path = log_path
         self.attempts = []
         self.user_attempts=defaultdict(list)
+        self.logLines={}
+
     def parse_log_file(self) -> None:
         """Parse the SSH log file and store attempts."""
         try:
             with open(self.log_path, 'r') as file:
-                for line in file:
+                for line_number, line in enumerate(file, start=0):
                     if 'sshd' in line and ('Failed password' in line or 
                                          'Invalid user' in line or 
                                          'Accepted password' in line or 
                                          'Accepted publickey' in line):
-                        self._process_line(line)
+                        self._process_line(line,line_number)
         except FileNotFoundError:
             print(f"Error: Log file '{self.log_path}' not found.")
             exit(1)
 
-    def _process_line(self, line: str) -> None:
+    def _process_line(self, line: str,line_number:int) -> None:
         """Process each line and extract login attempt information."""
         timestamp = self._extract_timestamp(line)
         ip = self._extract_ip(line)
         username = self._extract_username(line)
-
+        self.logLines.setdefault(username, []).append(line_number)
         if not all([timestamp, ip, username]):
             return
 
@@ -66,7 +69,8 @@ class SSHLogAnalyzer:
             'username': username,
             'ip': masked_ip,
             'status': status,
-            'raw_line': line.strip()  # Store raw line for debugging
+            'raw_line': line.strip(),  # Store raw line for debugging
+            'line_number': line_number
         })
 
     def _extract_timestamp(self, line: str) -> str:
@@ -149,18 +153,19 @@ class SSHLogAnalyzer:
     
     
     def getUsernameAttempts(self,username)-> int:
+      print(self.user_attempts[username])
       attempts = self.user_attempts[username]
       # Total number of attempts
       return len(attempts)
 
-    def generate_report_by_username(self, username) -> str:
+    def generate_report_by_username(self, username):
       # Check if the username exists in user_attempts
       if username not in self.user_attempts:
           return f"No login attempts found for user: {username}"
 
       # Get the user's login attempts
       attempts = self.user_attempts[username]
-
+      
       # Total number of attempts
       total_attempts = len(attempts)
 
@@ -169,8 +174,10 @@ class SSHLogAnalyzer:
 
       # Count occurrences of each status
       status_counts = {}
+      lines_numbers=[]
       for attempt in attempts:
           status = attempt['status']
+          lines_numbers.append(attempt['line_number'])
           status_counts[status] = status_counts.get(status, 0) + 1
 
       # Build the status report
@@ -184,7 +191,9 @@ class SSHLogAnalyzer:
           f"User: {username}\n"
           f"Status: {status_report}"
       )
-      return report
+      return report,lines_numbers
+    def getUsernameLogLines(self,username):
+        return self.logLines.get(username, [])
 def send_notification(title, message):
     """
     Sends a system notification using plyer.
@@ -198,13 +207,26 @@ def send_notification(title, message):
         app_name="Python Script",
         timeout=10  # Notification duration in seconds
     )
-
+def moveLinesToAnotherFile(path,lines_numbers):
+    directory = os.path.dirname(path)
+    alert_file = os.path.join(directory, "alerts.log")
+    with fileinput.input(path, inplace=True) as file , open(alert_file, 'a') as backup:
+        for line_number, line in enumerate(file, start=0):
+          if line_number in lines_numbers:
+            backup.write(line)
+            # Skip the line you want to remove
+            continue
+          print(line, end='')
+    ###
+    return
 def notify_attempts(path,username, attempts):
     while True:
         analyzer=SSHLogAnalyzer(path)
         analyzer.parse_log_file()
-        total_attempts=analyzer.getUsernameAttempts(username)
-        if attempts>=total_attempts:
+        lines_numbers=analyzer.getUsernameLogLines(username)
+        total_attempts=len(lines_numbers)
+        if total_attempts>=attempts:
+            moveLinesToAnotherFile(path,lines_numbers)
             send_notification("Attemtps alert!",f"User {username} has reached {attempts} attempts")
         time.sleep(20)
 def main():
@@ -234,7 +256,7 @@ def main():
         analyzer = SSHLogAnalyzer(args.log_file)
         analyzer.parse_log_file()
         analyzer.generate_report()
-        report=analyzer.generate_report_by_username(args.user.strip())
+        report,_=analyzer.generate_report_by_username(args.user.strip())
         print()
         # report=analyzer.generate_report_by_username("admin")
       

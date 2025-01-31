@@ -195,7 +195,7 @@ def send_notification(title, message):
     notification.notify(
         title=title,
         message=message,
-        app_name="Python Script",
+        app_name="Auth script",
         timeout=10  # Notification duration in seconds
     )
 
