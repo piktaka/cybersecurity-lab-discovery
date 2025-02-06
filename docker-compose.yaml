@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  app:
+    image: lablabee/xss-case-platform:cybersec-discovery
+
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    volumes:
+      - ./public:/opt/server/public
+  mongo:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    # environment:
+    #   # MONGO_INITDB_ROOT_USERNAME: admin
+    #   # MONGO_INITDB_ROOT_PASSWORD: adminpassword
+    volumes:
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
