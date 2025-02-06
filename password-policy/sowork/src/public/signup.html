@@ -16,7 +16,7 @@
         body {
             display: flex;
             min-height: 100vh;
-            background: linear-gradient(to right, white 60%, #f0f7f7 40%);
+            background-color: white;
         }
 
         .container {
@@ -268,9 +268,6 @@
             </form>
         </div>
         
-        <!-- <div class="illustration">
-            <img src="/api/placeholder/500/400" alt="Network Illustration">
-        </div> -->
     </div>
 
     <script>
@@ -356,10 +353,9 @@
 
 
 
-                console.log('Sending signup request:', { username, password: '****' });
 
                 try {
-                    const response = await fetch('http://127.0.0.1:5000/api/auth/signup', {
+                    const response = await fetch('/api/auth/signup', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -373,7 +369,6 @@
                     });
 
                     const data = await response.json();
-                    console.log('Signup response:', data);
 
                     if (data.success) {
                         // Show success message
@@ -398,7 +393,6 @@
                         }, 3000);
                     }
                 } catch (error) {
-                    console.error('Error:', error);
                     const errorAlert = document.createElement('div');
                     errorAlert.className = 'alert alert-error';
                     errorAlert.textContent = '❌ Error creating account. Please try again.';

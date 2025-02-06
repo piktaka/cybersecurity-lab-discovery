@@ -271,13 +271,12 @@
 
         async function fetchUsers() {
             try {
-                const response = await fetch(`http://127.0.0.1:5000/api/auth/users`);
+                const response = await fetch(`/api/auth/users`);
                 const data = await response.json();
                 
                 if (data.success) {
                     displayUsers(data.users);
                 } else {
-                    console.error('Error fetching users:', data.message);
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -330,14 +329,11 @@
         // Initial load
         document.addEventListener('DOMContentLoaded', () => {
            if (loadAdminData()){
-            console.log("this is when loaded");
             fetchUsers()
             refreshTimer = setInterval(fetchUsers, 60000);
 
            }
-            // fetchUsers();
             
-            // Refresh user list every minute
         });
 
         // Clean up timer when leaving page
@@ -355,7 +351,6 @@
         
     </script>
 
-    <!-- <script src="auth.js"></script> -->
 
 </body>
 </html>

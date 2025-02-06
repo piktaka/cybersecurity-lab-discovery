@@ -1,5 +1,0 @@
-
-
-root    ALL=(ALL:ALL) ALL
-ubuntu ALL=(ALL) NOPASSWD: /usr/bin/file
-%sudo   ALL=(ALL:ALL) ALL

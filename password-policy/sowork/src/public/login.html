@@ -14,10 +14,10 @@
         }
 
         body {
-            display: flex;
-            min-height: 100vh;
-            background: linear-gradient(to right, white 60%, #f0f7f7 40%);
-        }
+    display: flex;
+    min-height: 100vh;
+    background: white; 
+}
 
         .container {
             display: flex;
@@ -250,9 +250,6 @@
             </p>
         </div>
         
-        <!-- <div class="illustration">
-            <img src="/api/placeholder/500/400" alt="Network Illustration">
-        </div> -->
     </div>
 
     <!-- Password Change Modal -->
@@ -282,26 +279,21 @@
         </div>
     </div>
 
-    <!-- Alerts -->
     <div class="alert alert-success" id="successAlert"></div>
     <div class="alert alert-error" id="errorAlert"></div>
 
-    <!-- <script src="auth.js"></script> -->
     <script>
         // Toggle password visibility
         document.querySelectorAll('.password-toggle').forEach(toggle => {
             toggle.addEventListener('click', (e) => {
-        console.log("Toggling password visibility");
 
         const passwordInput = e.target.parentElement.querySelector('input');
-        console.log("Input value:", passwordInput.value);
+    
 
         // Toggle type
-        // // const type = passwordInput.type === 'password' ? 'text' : 'password';
-        // passwordInput.setAttribute('type',type)
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type',type)
 
-        let type = passwordInput.type
-        console.log("type is:", type);
 
     
         // Toggle eye icon class
@@ -344,7 +336,7 @@
             loginButton.textContent = 'Logging in...';
 
             try {
-                const response = await fetch('http://127.0.0.1:5000/api/auth/login', {
+                const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -357,7 +349,6 @@
                 });
 
                 const data = await response.json();
-                console.log('Login response:', data); // Debug log
 
                 if (data.success) {
                     localStorage.setItem('user', JSON.stringify(data.user));
@@ -376,7 +367,6 @@
                     showAlert(document.getElementById('errorAlert'));
                 }
             } catch (error) {
-                console.error('Login error:', error);
                 document.getElementById('errorAlert').textContent = '❌ Connection error. Please try again.';
                 showAlert(document.getElementById('errorAlert'));
             } finally {
@@ -401,7 +391,7 @@
             }
 
             try {
-                const response = await fetch('http://127.0.0.1:5000/api/auth/change-password', {
+                const response = await fetch('/api/auth/change-password', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -420,7 +410,6 @@
                     document.getElementById('successAlert').textContent = '🎉 Password changed successfully! Please log in again.';
                     showAlert(document.getElementById('successAlert'));
                     
-                    // Clear both forms
                     document.getElementById('loginForm').reset();
                     document.getElementById('passwordChangeForm').reset();
                 } else {
@@ -428,15 +417,12 @@
                     showAlert(document.getElementById('errorAlert'));
                 }
             } catch (error) {
-                // console.log("the data",response)
 
-                console.error('Password change error:', error);
                 document.getElementById('errorAlert').textContent = '❌ Error changing password. Please try again.';
                 showAlert(document.getElementById('errorAlert'));
             }
         });
 
-        // Close modal when clicking outside
         window.onclick = (event) => {
             const modal = document.getElementById('passwordChangeModal');
             if (event.target === modal) {

@@ -145,7 +145,6 @@
         <div class="dashboard-card">
             <h2 class="dashboard-title">Your Account Information</h2>
             <div class="user-details" id="userDetails">
-                <!-- User details will be populated here -->
             </div>
         </div>
     </div>
@@ -172,7 +171,6 @@
         }
     </style>
 
-    <!-- <script src="auth.js"></script> -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             loadUserData();
@@ -226,38 +224,7 @@
             }
         }
 
-        // function loadUserData() {
-        //     const user = JSON.parse(localStorage.getItem('user'));
-        //     if (!user) return;
-
-        //     // Update header info
-        //     document.getElementById('displayUsername').textContent = user.username;
-        //     document.getElementById('lastLogin').textContent = `Last login: ${new Date().toLocaleString()}`;
-        //     document.getElementById('welcomeMessage').textContent = `You are successfully logged in as ${user.username}`;
-
-        //     // Update user details
-        //     const userDetails = document.getElementById('userDetails');
-        //     userDetails.innerHTML = `
-        //         <div class="detail-item">
-        //             <span class="detail-label">Username</span>
-        //             <span class="detail-value">${user.username}</span>
-        //         </div>
-        //         <div class="detail-item">
-        //             <span class="detail-label">Status</span>
-        //             <span class="detail-value success-status">
-        //                 <i class="fas fa-check-circle"></i> Active
-        //             </span>
-        //         </div>
-        //         <div class="detail-item">
-        //             <span class="detail-label">Last Password Change</span>
-        //             <span class="detail-value">${new Date(user.lastPasswordChange).toLocaleString()}</span>
-        //         </div>
-        //         <div class="detail-item">
-        //             <span class="detail-label">Account Created</span>
-        //             <span class="detail-value">${new Date(user.createdAt).toLocaleString()}</span>
-        //         </div>
-        //     `;
-        // }
+       
 
         function logout() {
             localStorage.removeItem('user');
