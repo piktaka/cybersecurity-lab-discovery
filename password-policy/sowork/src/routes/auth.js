@@ -9,15 +9,51 @@ const path = require("path");
 router.post("/signup", async (req, res) => {
   try {
     const { username, password, email } = req.body;
+    const requirements = {
+      lengthReq: (str) => str.length >= 12,
+      upperReq: (str) => /[A-Z]/.test(str),
+      lowerReq: (str) => /[a-z]/.test(str),
+      numberReq: (str) => /[0-9]/.test(str),
+      specialReq: (str) => /[!@#$%^&*(),.?":{}|<>]/.test(str),
+    };
 
-    if (!username || !password || password.length >= 12) {
+    if (!username || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Username and password are required.",
+      });
+    }
+    if (!requirements.lengthReq(password)) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 12 characters long.",
+      });
+    }
+    if (!requirements.upperReq(password)) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must contain at least one uppercase letter.",
+      });
+    }
+    if (!requirements.lowerReq(password)) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must contain at least one lowercase letter.",
+      });
+    }
+    if (!requirements.numberReq(password)) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must contain at least one number.",
+      });
+    }
+    if (!requirements.specialReq(password)) {
       return res.status(400).json({
         success: false,
         message:
-          "Username and password are required or need to be 12 characters",
+          'Password must contain at least one special character (!@#$%^&*(),.?":{}|<>).',
       });
     }
-
     const existingUser = await User.findOne({
       $or: [{ username: username }, { email: email }],
     });
