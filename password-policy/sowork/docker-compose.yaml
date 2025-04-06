@@ -1,11 +1,11 @@
-version: '3.8'
+version: "3.8"
 
 services:
   app:
-    image: password-policy-platform:latest
+    image: lablabee/password-policy-platform:cybersec-discovery
 
     ports:
-      - "5000:5000"
+      - "12000:5000"
     depends_on:
       - mongo
     volumes:
