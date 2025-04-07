@@ -9,6 +9,7 @@ RUN npm install
 
 
 WORKDIR /opt/sowork/src
+RUN mkdir /opt/validation
 EXPOSE 5000
 RUN apt update && apt install -y netcat-traditional
 CMD [ "node", "server.js" ]
