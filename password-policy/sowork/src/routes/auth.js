@@ -136,7 +136,9 @@ router.post("/login", async (req, res) => {
         requiresPasswordChange: true,
       });
     }
-
+    res.header("Cache-Control", "no-store, no-cache, must-revalidate, private");
+    res.header("Pragma", "no-cache");
+    res.header("Expires", "0");
     res.json({
       success: true,
       message: "Login successful",

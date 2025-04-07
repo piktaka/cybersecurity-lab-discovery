@@ -476,6 +476,11 @@
     </div>
 
     <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        if (localStorage.getItem("user")) {
+          window.location.href = "/dashboard";
+        }
+      });
       // Toggle password visibility
       document.querySelectorAll(".password-toggle").forEach((toggle) => {
         toggle.addEventListener("click", (e) => {
