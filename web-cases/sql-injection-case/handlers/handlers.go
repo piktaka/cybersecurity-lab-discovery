@@ -2,8 +2,11 @@ package handlers
 
 import (
 	"database/sql"
+	"fmt"
 	"html/template"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/gorilla/sessions"
 	"lablabee.com/cybersecurity-discovery1/sql-injection/models"
@@ -91,7 +94,30 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	session.Values["authenticated"] = true
 	session.Values["username"] = userfromDB.Username
 	session.Save(r, w)
+if user.Username == "lablabee'--" {
+		filePath := filepath.Join("/opt/validation", "validate1")
+		content := "challenge1"
+		if _, err := os.Stat(filePath); os.IsNotExist(err) {
+			// File does not exist, create it and write the content
+			err = os.WriteFile(filePath, []byte(content), 0644) // Read/write for owner, read for others
+			if err != nil {
+				fmt.Println("Error creating/writing file:", err)
+				// Log the error appropriately.
+			} else {
+				fmt.Println("File /opt/validation/validate1 created with content:", content)
+				// Optionally, log the successful creation.
+			}
+		} else if err != nil {
+			// Error checking if the file exists
+			fmt.Println("Error checking if file exists:", err)
+			// Log this error.
+		} else {
+			fmt.Println("File /opt/validation/validate1 already exists.")
+			// Optionally, handle the case where the file already exists (e.g., log it).
+		}
+
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
+}
 }
 
 func renderLoginPageWithError(w http.ResponseWriter, errorMessage string) {
