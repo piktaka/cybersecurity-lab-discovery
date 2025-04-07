@@ -27,6 +27,7 @@ RUN go build -o sql-injection-platform .
 RUN mv login.html home.html sql-injection-platform /opt/sql-injection-case-app
 WORKDIR /opt/sql-injection-case-app
 RUN rm -rf /opt/sql-injection-case
+RUN mkdir /opt/validation
 EXPOSE 8080
 
 CMD ["./sql-injection-platform"]
