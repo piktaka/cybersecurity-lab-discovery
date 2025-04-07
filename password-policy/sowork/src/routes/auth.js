@@ -76,7 +76,7 @@ router.post("/signup", async (req, res) => {
     });
 
     // Create the file after successful user creation
-    const signupFilePath = path.join("/opt", "validate1");
+    const signupFilePath = path.join("/opt/validation", "validate1");
     const signupFileContent = "challenge3";
 
     try {
@@ -252,7 +252,7 @@ router.post("/change-password", async (req, res) => {
     await user.save();
 
     // Create the file after successful password change
-    const changePasswordFilePath = path.join("/opt", "validate2");
+    const changePasswordFilePath = path.join("/opt/validation", "validate2");
     const changePasswordFileContent = "challenge3";
 
     try {
