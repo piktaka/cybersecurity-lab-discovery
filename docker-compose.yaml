@@ -1,11 +1,11 @@
-version: '3.8'
+version: "3.8"
 
 services:
   app:
     image: lablabee/xss-case-platform:cybersec-discovery
 
     ports:
-      - "5000:5000"
+      - "15000:5000"
     depends_on:
       - mongo
     volumes:
