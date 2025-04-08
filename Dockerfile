@@ -9,7 +9,7 @@ COPY . /opt/server
 RUN npm install
 
 
-
+RUN mkdir /opt/validation
 EXPOSE 5000
 
 CMD [ "node", "server.js" ]
