@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@2.4.4/dist/purify.min.js"></script>
+
+    <title>Comments System</title>
+    <style>
+      :root {
+        --primary-color: #4fa892;
+        --primary-dark: #3d8b77;
+        --text-dark: #1a2e4c;
+        --text-light: #666;
+        --background-light: #f5f5f5;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background-color: var(--background-light);
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .user-banner {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 20px;
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .user-avatar {
+        width: 50px;
+        height: 50px;
+        background-color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-color);
+      }
+
+      .comments-section {
+        padding: 20px;
+      }
+
+      .comment-form {
+        margin: 20px 0;
+        display: flex;
+        gap: 10px;
+      }
+
+      .comment-input {
+        flex: 1;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: vertical;
+        min-height: 44px;
+      }
+
+      .submit-btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 44px;
+      }
+
+      .submit-btn:hover {
+        background-color: var(--primary-dark);
+      }
+
+      .comment {
+        border-bottom: 1px solid #eee;
+        padding: 15px 0;
+      }
+
+      .comment.current-user {
+        background-color: #e8f5f2;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+
+      .comment-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+
+      .author {
+        font-weight: 600;
+        color: var(--text-dark);
+      }
+
+      .date {
+        color: var(--text-light);
+        font-size: 0.9em;
+      }
+
+      .you-badge {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.8em;
+      }
+
+      .comment-text {
+        color: var(--text-dark);
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- User Banner -->
+      <div class="user-banner">
+        <div class="user-info">
+          <div class="user-avatar">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <div class="user-details">
+            <h2>John Smith</h2>
+            <p>Software Engineer</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="comments-section">
+        <h3>Comments</h3>
+
+        <form id="comment-form" class="comment-form">
+          <input
+            type="text"
+            id="comment-input"
+            class="comment-input"
+            placeholder="Add a comment..."
+            required
+          />
+          <button type="submit" class="submit-btn">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+            Post
+          </button>
+        </form>
+
+        <div id="comments-list"></div>
+      </div>
+    </div>
+
+    <script>
+      const currentUser = {
+        name: "John Smith",
+        id: "123",
+      };
+
+      // Fetch comments when page loads
+      async function fetchComments() {
+        try {
+          const response = await fetch("/api/comments");
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch comments");
+          }
+
+          const data = await response.json();
+          const comments = data;
+          const commentsList = document.getElementById("comments-list");
+
+          comments.forEach((comment) => {
+            const commentElement = createCommentElement(comment);
+            commentsList.appendChild(commentElement);
+          });
+        } catch (error) {
+          console.error("Error fetching comments:", error);
+          showNotification(
+            "Failed to load comments. Please refresh the page.",
+            "error"
+          );
+        }
+      }
+
+      // Create comment HTML element
+      function createCommentElement(comment) {
+        const div = document.createElement("div");
+        div.className = `comment ${
+          comment.userId === currentUser.id ? "current-user" : ""
+        }`;
+
+        const date = new Date(comment.timestamp).toLocaleDateString();
+
+        div.innerHTML = `
+        <div class="comment-header">
+            <span class="author">${comment.author}</span>
+            ${
+              comment.userId === currentUser.id
+                ? '<span class="you-badge">You</span>'
+                : ""
+            }
+            <span class="date">${date}</span>
+        </div>
+        <div class="comment-text">${comment.text}</div>
+    `;
+        return div;
+      }
+
+      // Handle new comment submission
+      document
+        .getElementById("comment-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const input = document.getElementById("comment-input");
+          const submitButton = document.querySelector(".submit-btn");
+          const commentText = input.value.trim();
+
+          if (!commentText) return;
+
+          try {
+            // Disable form while submitting
+            input.disabled = true;
+            submitButton.disabled = true;
+            submitButton.innerHTML = `
+                    <svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Posting...
+                `;
+
+            // Send to server
+            const response = await fetch("/api/comments", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                text: commentText,
+                author: currentUser.name,
+                userId: currentUser.id,
+              }),
+            });
+            if (response.status != 201) {
+              throw new Error("Failed to save comment");
+            }
+
+            const result = await response.json();
+            if (response.status == 201) {
+              // Create and add the new comment element
+              const commentElement = createCommentElement(result);
+              const commentsList = document.getElementById("comments-list");
+              commentsList.insertBefore(
+                commentElement,
+                commentsList.firstChild
+              );
+
+              // Clear input
+              input.value = "";
+              showNotification("Comment posted successfully!", "success");
+            } else {
+              throw new Error(result.error || "Failed to save comment");
+            }
+          } catch (error) {
+            console.error("Error saving comment:", error);
+            showNotification(
+              "Failed to post comment. Please try again.",
+              "error"
+            );
+          } finally {
+            // Re-enable form
+            input.disabled = false;
+            submitButton.disabled = false;
+            submitButton.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                    Post
+                `;
+          }
+        });
+
+      function showNotification(message, type) {
+        const notification = document.createElement("div");
+        notification.className = `notification ${type}`;
+        notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 24px;
+                border-radius: 4px;
+                color: white;
+                font-weight: 500;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                z-index: 1000;
+            `;
+
+        if (type === "success") {
+          notification.style.backgroundColor = "var(--primary-color)";
+        } else {
+          notification.style.backgroundColor = "#dc3545";
+        }
+
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.style.opacity = "1";
+        }, 10);
+
+        setTimeout(() => {
+          notification.style.opacity = "0";
+          setTimeout(() => {
+            document.body.removeChild(notification);
+          }, 300);
+        }, 3000);
+      }
+
+      // Add loading state CSS
+      const style = document.createElement("style");
+      style.textContent = `
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+            .animate-spin {
+                animation: spin 1s linear infinite;
+            }
+            .submit-btn:disabled {
+                opacity: 0.7;
+                cursor: not-allowed;
+            }
+            .comment-input:disabled {
+                background-color: #f5f5f5;
+                cursor: not-allowed;
+            }
+        `;
+      document.head.appendChild(style);
+      document.addEventListener("DOMContentLoaded", fetchComments);
+    </script>
+  </body>
+</html>
